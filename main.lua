@@ -183,20 +183,38 @@ end)
 --Добавляем овнершип на лодку
 local ownershiptag = 'uid_private'
 
-local function MakeOwnershipable(inst)
-	inst:ListenForEvent("onbuilt", function(inst, data)
-		if not data or not data.builder then
-			return
-		end
-		
+local function MakeOwnershipable(inst, noevent)
+	local function onbuilt(inst, doer)
 		inst.ownerlist = {}
-		if data.builder.userid then
+		if doer.userid then
 			inst:AddTag(ownershiptag)
-			inst:AddTag('uid_'..data.builder.userid)
+			inst:AddTag('uid_'..doer.userid)
 			inst.ownerlist[1] = ownershiptag
-			inst.ownerlist[2] = 'uid_'..data.builder.userid
+			inst.ownerlist[2] = 'uid_'..doer.userid
 		end
-	end)
+	end
+	
+	--Да, жутко, но клеевцы не запускают вообще ничего для мачты.
+	if noevent then
+		inst:DoTaskInTime(0, function(inst)
+			if inst:HasTag(ownershiptag) then
+				return
+			end
+			print("test")
+			local pos = inst:GetPosition()
+			local player = TheSim:FindEntities(pos.x, 0, pos.z, 1, {"player"}, {"playerghost"})[1]
+			if player then
+				onbuilt(inst, player)
+			end
+		end)
+	else
+		inst:ListenForEvent("onbuilt", function(inst, data)
+			if not data or not data.builder then
+				return
+			end
+			onbuilt(inst, data.builder)
+		end)
+	end
 	
 	local _OnSave = inst.OnSave or function() end
 	local _OnLoad = inst.OnLoad or function() end
@@ -254,8 +272,11 @@ menv.AddComponentPostInit("steeringwheel", function(self)
 end)
 
 menv.AddComponentPostInit("mast", function(self)
-	MakeOwnershipable(self.inst)
+	MakeOwnershipable(self.inst, true)
 end)
 
 OwnershipAction("STEER_BOAT")
 OwnershipAction("RAISE_SAIL")
+OwnershipAction("LOWER_SAIL")
+-- OwnershipAction("LOWER_SAIL_BOOST")
+-- OwnershipAction("LOWER_SAIL_FAIL")
