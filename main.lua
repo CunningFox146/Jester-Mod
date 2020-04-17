@@ -200,7 +200,6 @@ local function MakeOwnershipable(inst, noevent)
 			if inst:HasTag(ownershiptag) then
 				return
 			end
-			print("test")
 			local pos = inst:GetPosition()
 			local player = TheSim:FindEntities(pos.x, 0, pos.z, 1, {"player"}, {"playerghost"})[1]
 			if player then
