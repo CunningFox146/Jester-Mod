@@ -273,6 +273,14 @@ end)
 
 menv.AddComponentPostInit("mast", function(self)
 	MakeOwnershipable(self.inst, true)
+	
+	local _AddSailFurler = self.AddSailFurler
+	function self:AddSailFurler(doer, ...)
+		if TestOwnership(self.inst, doer) == false then
+			return false
+		end
+		return _AddSailFurler(self, doer, ...)
+	end
 end)
 
 OwnershipAction("STEER_BOAT")
