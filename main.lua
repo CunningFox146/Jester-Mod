@@ -247,6 +247,7 @@ end
 local function OwnershipAction(act_name)
 	local _fn = ACTIONS[act_name].fn
 	ACTIONS[act_name].fn = function(act, ...)
+		-- print("RUN", act_name)
 		if act.target and act.doer and TestOwnership(act.target, act.doer) == false then
 			return false
 		end
@@ -277,5 +278,5 @@ end)
 OwnershipAction("STEER_BOAT")
 OwnershipAction("RAISE_SAIL")
 OwnershipAction("LOWER_SAIL")
--- OwnershipAction("LOWER_SAIL_BOOST")
+OwnershipAction("LOWER_SAIL_BOOST")
 -- OwnershipAction("LOWER_SAIL_FAIL")
