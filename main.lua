@@ -201,7 +201,7 @@ local function MakeOwnershipable(inst, noevent)
 				return
 			end
 			local pos = inst:GetPosition()
-			local player = TheSim:FindEntities(pos.x, 0, pos.z, 1, {"player"}, {"playerghost"})[1]
+			local player = TheSim:FindEntities(pos.x, 0, pos.z, 2, {"player"}, {"playerghost"})[1]
 			if player then
 				onbuilt(inst, player)
 			end
