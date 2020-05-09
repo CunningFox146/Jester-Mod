@@ -1,5 +1,5 @@
 name =						" JesterOK mod"
-version = 					"3.0"
+version = 					"3.0.1"
 description =				"Version: "..version
 author =					"Cunning fox"
 
