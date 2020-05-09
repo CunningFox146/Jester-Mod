@@ -132,12 +132,12 @@ if not TheNet:GetIsServer() then
 end
 
 local function UpdateAge(inst)
-	print("UpdateAge", inst._days)
 	if not inst._days then
 		return
 	end
-	
 	local delta = TheWorld.state.cycles - inst._days
+	
+	print("UpdateAge", inst._days, delta, GLOMMER_DAYS)
 	
 	if delta >= GLOMMER_DAYS then
 		inst:AddTag("wants_to_die")
