@@ -1,3 +1,6 @@
+local DISCORD_URL = "google.com"
+local DONATE_URL = "google.com"
+
 local MOBS_LIST = GetModConfigData("mobs") or {moose = true}
 local GLOMMER_DAYS = GetModConfigData("glommer") or 100
 
@@ -78,7 +81,7 @@ menv.AddModRPCHandler("JESTER", "GET_DATA", function(inst, item)
 	end
 end)
 
-if not TheNet:IsDedicated() then 
+if not TheNet:IsDedicated() then
 	menv.AddPlayerPostInit(function(inst)
 		inst:DoTaskInTime(0, function()
 			if not inst == ThePlayer then
@@ -128,6 +131,25 @@ if not TheNet:IsDedicated() then
 			end
 			return _SetString(text, str)
 		end
+	end)
+	
+	local ImageButton = require("widgets/imagebutton")
+	menv.AddClassPostConstruct("widgets/controls", function(self)
+		if not self.inv then
+			return
+		end
+		
+		self.discord = self.inv:AddChild(ImageButton("images/ui.xml", "button_large.tex", "button_large_over.tex", "button_large_disabled.tex"))
+		self.discord:SetPosition(-750, 150)
+		self.discord:SetOnClick(function()
+			VisitURL(DISCORD_URL)
+		end)
+		
+		self.donate = self.inv:AddChild(ImageButton("images/ui.xml", "button_large.tex", "button_large_over.tex", "button_large_disabled.tex"))
+		self.donate:SetPosition(-550, 150)
+		self.donate:SetOnClick(function()
+			VisitURL(DONATE_URL)
+		end)
 	end)
 end
 
