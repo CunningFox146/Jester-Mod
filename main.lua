@@ -1,6 +1,10 @@
 local MOBS_LIST = GetModConfigData("mobs") or {moose = true}
 local GLOMMER_DAYS = GetModConfigData("glommer") or 100
 
+PrefabFiles = {
+	"smoketrail",
+}
+
 local menv = env
 GLOBAL.setfenv(1, GLOBAL)
 
@@ -343,3 +347,29 @@ OwnershipAction("RAISE_SAIL")
 OwnershipAction("LOWER_SAIL")
 OwnershipAction("LOWER_SAIL_BOOST")
 -- OwnershipAction("LOWER_SAIL_FAIL")
+
+local function FirePostInit(inst)
+	inst:AddComponent("smokeemitter")
+	
+	local _Ignite = inst.components.burnable.Ignite
+	local _Extinguish = inst.components.burnable.Extinguish
+	
+	inst.components.burnable.Ignite = function(...)
+		inst.components.smokeemitter:Enable()
+		return _Ignite(...)
+	end
+	
+	inst.components.burnable.Extinguish = function(...)
+		inst.components.smokeemitter:Disable()
+		return _Extinguish(...)
+	end
+	
+	inst:DoTaskInTime(0, function(inst)
+		if inst.components.burnable.burning then
+			inst.components.burnable:Ignite()
+		end
+	end)
+end
+
+menv.AddPrefabPostInit("campfire", FirePostInit)
+menv.AddPrefabPostInit("firepit", FirePostInit)
