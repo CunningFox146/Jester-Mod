@@ -194,11 +194,9 @@ menv.AddPrefabPostInit("cave_entrance_open", function(inst)
 end)
 
 local function AnnounceDeath(inst, cause, afflicter)
-	if not inst or not inst.name or not inst.prefab or
-	not (STRINGS.NAMES[string.upper(inst.prefab)] or inst.name) or
-	not afflicter or not afflicter.name or not afflicter.prefab or
-	(not MOBS_LIST[inst.prefab] and not inst:HasTag("epic") and inst.prefab ~= "glommer") --[[or
-	(not afflicter:HasTag("player") and not STRINGS.NAMES[string.upper(afflicter.prefab)])]] then
+	if not inst or not inst.GetBasicDisplayName or not inst.prefab or
+	not afflicter or not afflicter.GetBasicDisplayName or not afflicter.prefab or
+	(not MOBS_LIST[inst.prefab] and not inst:HasTag("epic") and inst.prefab ~= "glommer") then
 		return
 	end
 	
@@ -209,7 +207,7 @@ local function AnnounceDeath(inst, cause, afflicter)
 	
 	local killer = afflicter:HasTag("player") and "Игрок" or "Моб"
 	local killer_name = afflicter:HasTag("player") and afflicter.name or (STRINGS.NAMES[string.upper(afflicter.prefab)] or (cause and STRINGS.NAMES[string.upper(cause)]))
-	local target = STRINGS.NAMES[string.upper(inst.prefab)] or inst.name
+	local target = inst:GetBasicDisplayName()
 	
 	TheNet:Announce(string.format("%s %s убил %s", killer, killer_name, target, nil, nil, "death"))
 end
