@@ -1,4 +1,5 @@
 local MOBS_LIST = GetModConfigData("mobs") or {moose = true}
+local GLOMMER_DAYS = GetModConfigData("glommer") or 100
 
 local menv = env
 GLOBAL.setfenv(1, GLOBAL)
@@ -129,6 +130,45 @@ if not TheNet:GetIsServer() then
 	return
 end
 
+local function UpdateAge(inst)
+	if not inst._days then
+		return
+	end
+	
+	if inst._days >= GLOMMER_DAYS then
+		inst:AddTag("wants_to_die")
+		if inst.components.health then
+			inst.components.health:Kill()
+		else
+			inst:Remove()
+		end
+	end
+end
+
+menv.AddPrefabPostInit("glommer", function(inst)
+	inst._days = 0
+	
+	inst:WatchWorldState("cycles", function()
+		inst._days = inst._days + 1
+		UpdateAge(inst)
+	end)
+	
+	local _OnSave, _OnLoad = inst.OnSave, inst.OnLoad
+	inst.OnSave = function(inst, data, ...)
+		if data then
+			data.days = inst._days
+		end
+		return _OnSave(inst, data, ...)
+	end
+	
+	inst.OnLoad = function(inst, data, ...)
+		if data and data.days then
+			inst._days = data.days
+		end
+		return _OnLoad(inst, data, ...)
+	end
+end)
+
 menv.AddPrefabPostInitAny(function(inst)
 	if inst:HasTag("player") then
 		return
@@ -159,6 +199,11 @@ local function AnnounceDeath(inst, cause, afflicter)
 	not afflicter or not afflicter.name or not afflicter.prefab or
 	(not MOBS_LIST[inst.prefab] and not inst:HasTag("epic") and inst.prefab ~= "glommer") --[[or
 	(not afflicter:HasTag("player") and not STRINGS.NAMES[string.upper(afflicter.prefab)])]] then
+		return
+	end
+	
+	if inst.prefab == "glommer" and inst:HasTag("wants_to_die") then
+		print("[DEATH] Glommer've died of old age")
 		return
 	end
 	
@@ -268,6 +313,10 @@ menv.AddComponentPostInit("anchor", function(self)
 end)
 
 menv.AddComponentPostInit("steeringwheel", function(self)
+	MakeOwnershipable(self.inst)
+end)
+
+menv.AddComponentPostInit("boat", function(self)
 	MakeOwnershipable(self.inst)
 end)
 
