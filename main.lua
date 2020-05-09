@@ -6,6 +6,7 @@ GLOBAL.setfenv(1, GLOBAL)
 
 if not menv.MODROOT:find("workshop-") then
 	CHEATS_ENABLED = true
+	GLOMMER_DAYS = 5
 end
 
 local function IsAdmin(id)
@@ -131,11 +132,14 @@ if not TheNet:GetIsServer() then
 end
 
 local function UpdateAge(inst)
+	print("UpdateAge", inst._days)
 	if not inst._days then
 		return
 	end
 	
-	if inst._days >= GLOMMER_DAYS then
+	local delta = TheWorld.state.cycles - inst._days
+	
+	if delta >= GLOMMER_DAYS then
 		inst:AddTag("wants_to_die")
 		if inst.components.health then
 			inst.components.health:Kill()
@@ -146,10 +150,16 @@ local function UpdateAge(inst)
 end
 
 menv.AddPrefabPostInit("glommer", function(inst)
-	inst._days = 0
+	inst._days = nil
 	
 	inst:WatchWorldState("cycles", function()
-		inst._days = inst._days + 1
+		UpdateAge(inst)
+	end)
+	
+	inst:DoTaskInTime(0, function(inst)
+		if not inst._days then
+			inst._days = TheWorld.state.cycles
+		end
 		UpdateAge(inst)
 	end)
 	
