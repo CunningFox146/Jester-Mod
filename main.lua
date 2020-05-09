@@ -6,7 +6,7 @@ GLOBAL.setfenv(1, GLOBAL)
 
 if not menv.MODROOT:find("workshop-") then
 	CHEATS_ENABLED = true
-	GLOMMER_DAYS = 5
+	GLOMMER_DAYS = 1
 end
 
 local function IsAdmin(id)
@@ -135,12 +135,10 @@ local function UpdateAge(inst)
 	if not inst._days then
 		return
 	end
+	
 	local delta = TheWorld.state.cycles - inst._days
-	
-	print("UpdateAge", inst._days, delta, GLOMMER_DAYS)
-	
 	if delta >= GLOMMER_DAYS then
-		inst:AddTag("wants_to_die")
+		inst.wants_to_die = true
 		if inst.components.health then
 			inst.components.health:Kill()
 		else
@@ -204,14 +202,14 @@ menv.AddPrefabPostInit("cave_entrance_open", function(inst)
 end)
 
 local function AnnounceDeath(inst, cause, afflicter)
+	if inst and inst.prefab == "glommer" and inst.wants_to_die then
+		TheNet:Announce(string.format("Гломмер в мире %d умер от старости", TheShard:GetShardId() or 0), nil, nil, "death")
+		return
+	end
+
 	if not inst or not inst.GetBasicDisplayName or not inst.prefab or
 	not afflicter or not afflicter.GetBasicDisplayName or not afflicter.prefab or
 	(not MOBS_LIST[inst.prefab] and not inst:HasTag("epic") and inst.prefab ~= "glommer") then
-		return
-	end
-	
-	if inst.prefab == "glommer" and inst:HasTag("wants_to_die") then
-		print("[DEATH] Glommer've died of old age")
 		return
 	end
 	
@@ -219,11 +217,11 @@ local function AnnounceDeath(inst, cause, afflicter)
 	local killer_name = afflicter:HasTag("player") and afflicter.name or (STRINGS.NAMES[string.upper(afflicter.prefab)] or (cause and STRINGS.NAMES[string.upper(cause)]))
 	local target = inst:GetBasicDisplayName()
 	
-	TheNet:Announce(string.format("%s %s убил %s", killer, killer_name, target, nil, nil, "death"))
+	TheNet:Announce(string.format("%s %s убил %s", killer, killer_name, target), nil, nil, "death")
 end
 
 local function onentitydeath(world, data)
-	printwrap("killed", data)
+	printwrap("Kill data:", data)
 	if data and data.inst and not data.inst:HasTag("player") then
 		AnnounceDeath(data.inst, data.cause, data.afflicter)
 	end
