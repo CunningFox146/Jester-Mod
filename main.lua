@@ -8,6 +8,11 @@ PrefabFiles = {
 	"smoketrail",
 }
 
+Assets = {
+	Asset("ATLAS", "images/jester_btns.xml"),
+	Asset("IMAGE", "images/jester_btns.tex"),
+}
+
 local menv = env
 GLOBAL.setfenv(1, GLOBAL)
 
@@ -139,17 +144,27 @@ if not TheNet:IsDedicated() then
 			return
 		end
 		
-		self.discord = self.inv:AddChild(ImageButton("images/ui.xml", "button_large.tex", "button_large_over.tex", "button_large_disabled.tex"))
-		self.discord:SetPosition(-750, 150)
+		self.discord = self.topleft_root:AddChild(ImageButton("images/jester_btns.xml", "discord.tex"))
+		self.discord:SetPosition(35, -65)
+		self.discord.scale_on_focus = false
+		
 		self.discord:SetOnClick(function()
 			VisitURL(DISCORD_URL)
 		end)
 		
-		self.donate = self.inv:AddChild(ImageButton("images/ui.xml", "button_large.tex", "button_large_over.tex", "button_large_disabled.tex"))
-		self.donate:SetPosition(-550, 150)
+		self.discord:SetTooltip("Наш Discord сервер")
+		self.discord:SetTooltipPos(0, -40, 0)
+		
+		self.donate = self.topleft_root:AddChild(ImageButton("images/jester_btns.xml", "donate.tex"))
+		self.donate:SetPosition(115, -65)
+		self.donate.scale_on_focus = false
+		
 		self.donate:SetOnClick(function()
 			VisitURL(DONATE_URL)
 		end)
+		
+		self.donate:SetTooltip("Поддержать проект")
+		self.donate:SetTooltipPos(0, -40, 0)
 	end)
 end
 
