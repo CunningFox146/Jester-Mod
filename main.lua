@@ -255,10 +255,10 @@ local function AnnounceDeath(inst, cause, afflicter)
 	end
 	
 	local killer = afflicter:HasTag("player") and "Игрок" or "Моб"
-	local killer_name = afflicter:HasTag("player") and afflicter.name or (STRINGS.NAMES[string.upper(afflicter.prefab)] or (cause and STRINGS.NAMES[string.upper(cause)]))
+	local killer_name = afflicter:HasTag("player") and afflicter.name or afflicter:GetBasicDisplayName() or (cause and STRINGS.NAMES[string.upper(cause)]) or "ERROR"
 	local target = inst:GetBasicDisplayName()
 	
-	TheNet:Announce(string.format("%s %s убил %s", killer, killer_name, target), nil, nil, "death")
+	TheNet:Announce(string.format("%s %s убил %s", killer, killer_name or "error", target or "error"), nil, nil, "death")
 end
 
 local function onentitydeath(world, data)
