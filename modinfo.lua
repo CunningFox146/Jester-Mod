@@ -1,5 +1,5 @@
 name =						" JesterOK mod"
-version = 					"3.0.2"
+version = 					"4.0.0"
 description =				"Version: "..version
 author =					"Cunning fox"
 
@@ -13,3 +13,61 @@ api_version 				= 10
 
 all_clients_require_mod 	= true
 client_only_mod 			= false
+
+configuration_options = {
+	{
+		name = "mobs",
+		label = "",
+		options = {
+			{
+				description = "",
+				data = {moose = true},
+			}
+		},
+		default = {moose = true},
+	},
+	{
+		name = "glommer",
+		label = "",
+		options = {
+			{
+				description = "",
+				data = 100,
+			}
+		},
+		default = 100,
+	},
+	{
+		name = "hide_name",
+		label = "",
+		options = {
+			{
+				description = "",
+				data = false,
+			}
+		},
+		default = false,
+	},
+	{
+		name = "discord",
+		label = "",
+		options = {
+			{
+				description = "",
+				data = "",
+			}
+		},
+		default = "",
+	},
+	{
+		name = "donate",
+		label = "",
+		options = {
+			{
+				description = "",
+				data = "",
+			}
+		},
+		default = "",
+	},
+}

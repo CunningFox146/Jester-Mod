@@ -1,8 +1,9 @@
-local DISCORD_URL = "google.com"
-local DONATE_URL = "google.com"
+local DISCORD_URL = GetModConfigData("discord") or "https://discord.gg/E9D8bTp"
+local DONATE_URL = GetModConfigData("donate") or "https://donatepay.ru/don/JesterOK"
 
 local MOBS_LIST = GetModConfigData("mobs") or {moose = true}
-local GLOMMER_DAYS = GetModConfigData("glommer") or 100
+local GLOMMER_DAYS = GetModConfigData("glommer") or 59
+local HIDE_NAME = GetModConfigData("hide_name") or false
 
 PrefabFiles = {
 	"smoketrail",
@@ -87,7 +88,26 @@ menv.AddModRPCHandler("JESTER", "GET_DATA", function(inst, item)
 end)
 
 if not TheNet:IsDedicated() then
+	local function getlevel(inst)
+		return (not HIDE_NAME and inst:GetDisplayName() .. "\n" or "") .. "Ур.: " .. (inst.currentlevel and inst.currentlevel:value() or 0)
+	end
+
 	menv.AddPlayerPostInit(function(inst)
+		if not inst.Label then
+			inst.entity:AddLabel()
+		end
+		inst.Label:SetFontSize(22)
+		inst.Label:SetFont(NEWFONT_OUTLINE)
+		inst.Label:SetWorldOffset(0, 2, 0)
+
+		if inst.GetMyDisplayName then
+			inst.GetMyDisplayName = getlevel(inst)
+		else
+			inst.lbl_task = inst:DoPeriodicTask(0.5, function(inst)
+				inst.Label:SetText(getlevel(inst))
+			end)
+		end
+
 		inst:DoTaskInTime(0, function()
 			if not inst == ThePlayer then
 				return 
@@ -156,7 +176,7 @@ if not TheNet:IsDedicated() then
 		self.discord:SetTooltipPos(0, -40, 0)
 		
 		self.donate = self.topleft_root:AddChild(ImageButton("images/jester_btns.xml", "donate.tex"))
-		self.donate:SetPosition(115, -65)
+		self.donate:SetPosition(35 + 64, -65)
 		self.donate.scale_on_focus = false
 		
 		self.donate:SetOnClick(function()
