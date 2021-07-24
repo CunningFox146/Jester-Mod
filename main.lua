@@ -192,6 +192,23 @@ if not TheNet:GetIsServer() then
 	return
 end
 
+-- Fox: Fix Ownership
+-- боже блять это отвратительно
+do
+	local _haunt_ownership = ACTIONS.HAUNT.fn
+	local OLDACTIONS = ACTIONS
+	package.loaded["actions"] = nil
+	require("actions")
+	local _haunt = ACTIONS.HAUNT.fn
+	ACTIONS = OLDACTIONS
+	ACTIONS.HAUNT.fn = function(act, ...)
+		if act.target:HasTag("flower") then
+			return _haunt(act, ...)
+		end
+		return _haunt_ownership(act, ...)
+	end
+end
+
 local function UpdateAge(inst)
 	if not inst._days then
 		return
