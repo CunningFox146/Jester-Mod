@@ -202,7 +202,7 @@ do
 	local _haunt = ACTIONS.HAUNT.fn
 	ACTIONS = OLDACTIONS
 	ACTIONS.HAUNT.fn = function(act, ...)
-		if act.target:HasTag("flower") then
+		if act and act.target and act.target:HasTag("flower") then
 			return _haunt(act, ...)
 		end
 		return _haunt_ownership(act, ...)
